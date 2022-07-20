@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+		http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+		
+		<changeSet  id="2022_07_20_database_schema"  author="martibn">
+			<preConditions onFail="MARK_RAN">
+				<not>
+					<tableExists tableName="solar_data"/>
+				</not>
+			</preConditions>
+			
+			<sql>
+				CREATE TABLE solar_data (
+					"timestamp" timestamp NOT NULL,
+					power_generated decimal,
+					grid_injection decimal,
+					grid_consumption decimal,
+					power_consumption decimal,
+					CONSTRAINT power_pk PRIMARY KEY ("timestamp")
+				);
+				
+				create view solar_data_day_summary as 
+				select date_trunc('day', timestamp) as "timestamp", sum(power_generated)/12 "power_generated", sum(grid_injection)/12 as "grid_injection", sum(grid_consumption)/12 as "grid_consumption", sum(power_consumption)/12 as "power_consumption" 
+				from solar_data sd 
+				GROUP BY date_trunc('day', timestamp);
+				
+				create view solar_data_month_summary as 
+				select date_trunc('month', timestamp) as "timestamp", sum(power_generated)/12 "power_generated", sum(grid_injection)/12 as "grid_injection", sum(grid_consumption)/12 as "grid_consumption", sum(power_consumption)/12 as "power_consumption" 
+				from solar_data sd 
+				GROUP BY date_trunc('month', timestamp);
+				
+				
+				create view solar_data_year_summary as 
+				select date_trunc('year', timestamp) as "timestamp", sum(power_generated)/12 "power_generated", sum(grid_injection)/12 as "grid_injection", sum(grid_consumption)/12 as "grid_consumption", sum(power_consumption)/12 as "power_consumption" 
+				from solar_data sd 
+				GROUP BY date_trunc('year', timestamp);
+			</sql>
+		</changeSet>
+		
+</databaseChangeLog>
