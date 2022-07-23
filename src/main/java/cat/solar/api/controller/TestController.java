@@ -12,12 +12,10 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class TestController {
 	
-	private final SolarDataRepository repo;
-
 	@GetMapping
 	public String test() {
 		
-		return repo.findAll().toString();
+		return "tested";
 	}
 
 }
